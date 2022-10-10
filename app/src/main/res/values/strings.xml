@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Location tracker</string>
+    <string name="top_address">Address</string>
+    <string name="top_id">ID</string>
+    <string name="address_id">1</string>
+    <string name="address">District number 4</string>
+    <string name="button_to_locations">Check Visited Locations</string>
+    <string name="button_to_map">Open Map</string>
+</resources>
