@@ -32,7 +32,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.*
 
-class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListener,LocationListener {
+class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+    LocationListener {
 
 
     private lateinit var mLocationRequest: com.google.android.gms.location.LocationRequest
@@ -41,25 +42,19 @@ class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListene
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var binding: MapFragmentBinding? = null
     lateinit var location: com.example.locationtracker.data.Location
-    private lateinit var list:List<Address>
-    private val TAG:String = ""
+    private lateinit var list: List<Address>
+    private val TAG: String = ""
     private lateinit var mLocationCallback: LocationCallback
 
-
-
-
-
-    private val viewModel: TrackerViewModel by activityViewModels{
+    private val viewModel: TrackerViewModel by activityViewModels {
         TrackerViewModelFactory(
             (activity?.application as TrackerApplication).database.locationDao()
         )
     }
 
-
-
-    companion object{
-        private const val LOCATION_REQUEST_CODE = 1 }
-
+    companion object {
+        private const val LOCATION_REQUEST_CODE = 1
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,11 +62,12 @@ class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListene
         savedInstanceState: Bundle?
     ): View? {
         //initialize view
-        val view:View = inflater.inflate(R.layout.map_fragment,container,false)
+        val view: View = inflater.inflate(R.layout.map_fragment, container, false)
         //initialize map fragment
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as? SupportMapFragment
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
         //Async map
         binding = MapFragmentBinding.bind(view)
         mapFragment?.getMapAsync({ googleMap ->
@@ -81,12 +77,11 @@ class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListene
         mLocationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
-                for (location in p0.locations){
-                    if (lastLocation != null && lastLocation != location)
-                    {
-                        setUpLocation(location)
-                        addLocation()
-                    }
+                for (location in p0.locations) {
+//                    if (lastLocation != null && lastLocation != location) {
+//                        setUpLocation(location)
+//                        addLocation()
+//                    }
                 }
             }
         }
@@ -113,14 +108,19 @@ class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListene
         setUpMap(requireContext())
     }
 
-    private fun setUpMap(context: Context){
+    private fun setUpMap(context: Context) {
 
         if (ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED)  {
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
 
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),LOCATION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_REQUEST_CODE
+            )
             return
         }
         mMap.isMyLocationEnabled = true
@@ -129,7 +129,7 @@ class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListene
         }
     }
 
-    fun setUpLocation(location: Location){
+    fun setUpLocation(location: Location) {
         lastLocation = location
         val currentLatLng = LatLng(location.latitude, location.longitude)
         placeMarkerOnMap(currentLatLng)
@@ -142,10 +142,12 @@ class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListene
     }
 
     private fun startLocationUpdates() {
-        Log.d(TAG,"Location updates started")
-        fusedLocationProviderClient.requestLocationUpdates(mLocationRequest,
+        Log.d(TAG, "Location updates started")
+        fusedLocationProviderClient.requestLocationUpdates(
+            mLocationRequest,
             mLocationCallback,
-            Looper.getMainLooper())
+            Looper.getMainLooper()
+        )
     }
 
 
@@ -156,23 +158,26 @@ class MapFragment: Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListene
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
     }
 
-    private fun addLocation(){
+    private fun addLocation() {
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
-        lastLocation?.let { list = geocoder.getFromLocation(it.latitude, it.longitude, 1)
-            Log.d(TAG,"Address List is ${list[0]}")
+        lastLocation?.let {
+            list = geocoder.getFromLocation(it.latitude, it.longitude, 1)
+            Log.d(TAG, "Address List is ${list[0]}")
             viewModel.addNewLocation(
                 list.get(0).getAddressLine(0).toString(),
 
-            )}
+                )
+        }
     }
 
     override fun onMarkerClick(p0: Marker) = false
     override fun onLocationChanged(location: Location) {
-//        if (lastLocation != location)
-//        {
-//            setUpLocation(location)
-//            addLocation()
-//        }
+        if (lastLocation != location)
+        {
+            Log.d(TAG, "in onLocationChanged")
+            setUpLocation(location)
+            addLocation()
+        }
 
     }
 
