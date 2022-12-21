@@ -1,6 +1,6 @@
 # Android-Location-Tracker-App
 
-Location Tracker is an android app made using Android Studio Kotlin.
+Location Tracker is an android app made using Android Studio Kotlin that tracks the user location.
 
 The app contains two avtivites:
 1- Shows the user location and pinpoint the user location after a specific time.
